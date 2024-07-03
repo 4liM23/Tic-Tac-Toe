@@ -1,12 +1,24 @@
+#check leetcode
+
+def get_player_names():
+    n1 = input("Input the first players name: ")
+    n2 = input("Input the second players name: ")
+    return n1, n2
+
+
+
 class Player:
-    # to be completed
+    
+    def __init__(self, symbol, name) -> None:
+        self.symbol = symbol
+        self.name = name
 
 
 class Board:
     def __init__(self):
         self.board = {'7': ' ', '8': ' ', '9': ' ',
-                      '4': ' ', '5': ' ', '6': ' ',
-                      '1': ' ', '2': ' ', '3': ' '}
+                            '4': ' ', '5': ' ', '6': ' ',
+                            '1': ' ', '2': ' ', '3': ' '}
 
 
     def display_board(self):
@@ -18,23 +30,32 @@ class Board:
 
 
     def update_board(self, position, symbol):
-        # to be completed
+        self.board[position] = symbol
 
 
     def is_position_available(self, position):
-        # to be completed
+        return self.board[position]==' '
 
 
 
 
 class GameState:
+
     def __init__(self):
         self.board = Board()
+        self.game_over = False
+        name1, name2 = get_player_names()
+        self.players = [Player('x', name1), Player('o', name2)]
+        self.currentPlayer = self. players[0]
+
         # to be completed
 
 
     def switch_player(self):
-        # to be completed
+        if self.currentPlayer == self.players[0]:
+            self.currentPlayer = self.players[1]
+        else:
+            self.currentPlayer = self.players[0]
 
 
     def check_winner(self):
@@ -57,7 +78,11 @@ class GameState:
 
 
     def check_tie(self):
-        # to be completed
+        if all([self.board.board[str(x)]!=' ' for x in range(1, 10)]) and not self.check_winner():
+            self.game_over = True
+            return True
+        else:
+            return False
 
 
 class Game:
@@ -68,19 +93,27 @@ class Game:
     def play(self):
         while not self.game_state.game_over:
             self.game_state.board.display_board()
-            print(f"It's your turn, /* fill in */ - Move to which place?")
+            print(f"It's your turn, {self.game_state.currentPlayer.name} - Move to which place?")
             move = input()
 
-
-            if # to be completed:
-               # to be completed 
+            if move in self.game_state.board.board.keys() and self.game_state.board.is_position_available(move):
+                self.game_state.board.update_board(move, self.game_state.currentPlayer.symbol)
+                if self.game_state.check_winner():
+                    print(f'Congrats for our winner: {self.game_state.currentPlayer.name}.')
+                elif self.game_state.check_tie():
+                    print(f"Oops, that's a tie, good game from both of the players.")
+                else: self.game_state.switch_player()
             else:
                 print("Invalid move. Try again.")
 
 
         restart = input("Do you want to play Again? (y/n)")
         if restart.lower() == "y":
-            # to be completed
+            game.game_state = GameState()
+            game.play()
+        else:
+            print('Alright then, goodbye!')
+            exit()
 
 
 if __name__ == "__main__":
