@@ -1,5 +1,9 @@
 #check leetcode
 
+import pygame as pg
+
+
+
 def get_player_names():
     n1 = input("Input the first players name: ")
     n2 = input("Input the second players name: ")
@@ -11,7 +15,7 @@ class Player:
     
     def __init__(self, symbol, name) -> None:
         self.symbol = symbol
-        self.name = name
+        # self.name = name
 
 
 class Board:
@@ -44,8 +48,8 @@ class GameState:
     def __init__(self):
         self.board = Board()
         self.game_over = False
-        name1, name2 = get_player_names()
-        self.players = [Player('x', name1), Player('o', name2)]
+        # name1, name2 = get_player_names()
+        self.players = [Player('x'), Player('o')]
         self.currentPlayer = self. players[0]
 
         # to be completed
@@ -87,33 +91,104 @@ class GameState:
 
 class Game:
     def __init__(self):
+        pg.init()
+        self.window_size = 300
+        self.rows = self.columns = 3
+        self.game_window = pg.display.set_mode((self.window_size, self.window_size))
         self.game_state = GameState()
+        self.font =    pg.font.Font(None, 74)
+        self.result_font =     pg.font.Font(None, 50)
+        self.grid_size = self.window_size // self.rows
+        self.game_results = None
 
 
+
+    def draw_grid(self):
+        for i in range(1, self.rows):
+            #rows
+            pg.draw.line(self.game_window, (0,0,0), (0, i * self.grid_size), (self.window_size, i * self.grid_size), 3)
+            #columns
+            pg.draw.line(self.game_window, (0,0,0), (i * self.grid_size, 0), (i * self.grid_size, self.window_size), 3)
+
+
+    def handle_mouse_press(self, x, y):
+        if 0 < x < self.grid_size:
+            if 0 < y < self.grid_size:
+                pos='7'
+            elif self.grid_size < y < 2 * self.grid_size:
+                pos='4'
+            elif self.grid_size * 2 < y < self.grid_size * 3:
+                pos='1'
+        elif self.grid_size < x < 2 * self.grid_size:
+            if 0 < y < self.grid_size:
+                pos='8'
+            elif self.grid_size < y < 2 * self.grid_size:
+                pos='5'
+            elif self.grid_size * 2 < y < self.grid_size * 3:
+                pos='2'
+        elif 2 * self.grid_size < x < 3 * self.grid_size:
+            if 0 < y < self.grid_size:
+                pos='9'
+            elif self.grid_size < y < 2 * self.grid_size:
+                pos='6'
+            elif self.grid_size * 2 < y < self.grid_size * 3:
+                pos='3'
+        return pos
+
+
+    def get_coords_from_key(self, key):
+        col = (int(key) - 1) % self.rows
+        row = (int(key) -1) // self.rows
+        x = col * self.grid_size + self.grid_size // 2
+        y = self.rows - row - 2 * self.grid_size +  self.grid_size // 2
+        return x, y
+
+
+    
     def play(self):
-        while not self.game_state.game_over:
-            self.game_state.board.display_board()
-            print(f"It's your turn, {self.game_state.currentPlayer.name} - Move to which place?")
-            move = input()
-
-            if move in self.game_state.board.board.keys() and self.game_state.board.is_position_available(move):
-                self.game_state.board.update_board(move, self.game_state.currentPlayer.symbol)
-                if self.game_state.check_winner():
-                    print(f'Congrats for our winner: {self.game_state.currentPlayer.name}.')
-                elif self.game_state.check_tie():
-                    print(f"Oops, that's a tie, good game from both of the players.")
-                else: self.game_state.switch_player()
-            else:
-                print("Invalid move. Try again.")
+        running = True
+        while running:
+            while not self.game_state.game_over:
+                self.game_window.fill((255, 255, 255))
+                self.draw_grid()
+                pg.display.update()
 
 
-        restart = input("Do you want to play Again? (y/n)")
-        if restart.lower() == "y":
-            game.game_state = GameState()
-            game.play()
-        else:
-            print('Alright then, goodbye!')
-            exit()
+                for event in pg.event.get():
+                    print("E")
+                    if event.type == pg.QUIT:
+                        running = False
+                        print("running = False now")
+                        exit()
+                    if event.type == pg.MOUSEBUTTONDOWN:
+                        x, y = pg.mouse.get_pos()
+                        print(x, y)
+        
+        pg.quit()
+                
+
+            # self.game_state.board.display_board()
+        #     print(f"It's your turn, {self.game_state.currentPlayer.name} - Move to which place?")
+        #     move = input()
+
+        #     if move in self.game_state.board.board.keys() and self.game_state.board.is_position_available(move):
+        #         self.game_state.board.update_board(move, self.game_state.currentPlayer.symbol)
+        #         if self.game_state.check_winner():
+        #             print(f'Congrats for our winner: {self.game_state.currentPlayer.name}.')
+        #         elif self.game_state.check_tie():
+        #             print(f"Oops, that's a tie, good game from both of the players.")
+        #         else: self.game_state.switch_player()
+        #     else:
+        #         print("Invalid move. Try again.")
+
+
+        # restart = input("Do you want to play Again? (y/n)")
+        # if restart.lower() == "y":
+        #     game.game_state = GameState()
+        #     game.play()
+        # else:
+        #     print('Alright then, goodbye!')
+        #     exit()
 
 
 if __name__ == "__main__":
